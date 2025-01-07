@@ -4,5 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+etherparse = "0.16.0"
 nu-plugin = "0.101.0"
 nu-protocol = "0.101.0"
+pcap-parser = { version = "0.16.0", features = ["data"] }
