@@ -1,16 +1,18 @@
-use crate::FormatPcapPlugin;
+use std::sync::mpsc;
+use std::thread;
 
 use etherparse::SlicedPacket;
 use nu_plugin::*;
 use nu_protocol::byte_stream::{ByteStream, Reader};
-use nu_protocol::IntoInterruptiblePipelineData;
-use nu_protocol::{Category, LabeledError, Record, Signature, Type};
-use nu_protocol::{PipelineData, Signals, Span, Value};
+use nu_protocol::{
+    Category, IntoInterruptiblePipelineData, LabeledError, PipelineData, Record, Signals,
+    Signature, Span, Type, Value,
+};
 use pcap_parser::data::PacketData;
 use pcap_parser::traits::PcapReaderIterator;
 use pcap_parser::{LegacyPcapReader, Linktype, PcapBlockOwned, PcapError};
-use std::sync::mpsc;
-use std::thread;
+
+use crate::FormatPcapPlugin;
 
 pub struct FromPcap;
 
@@ -201,17 +203,27 @@ fn write_packet_data_in(
             packet_record.push("protocol", Value::string("UDP", span));
             packet_record.push("src_port", Value::int(udp.source_port() as i64, span));
             packet_record.push("dst_port", Value::int(udp.destination_port() as i64, span));
+            packet_record.push("payload", Value::string(hex::encode(udp.payload()), span));
         }
         Some(etherparse::TransportSlice::Tcp(tcp)) => {
             packet_record.push("protocol", Value::string("TCP", span));
             packet_record.push("src_port", Value::int(tcp.source_port() as i64, span));
             packet_record.push("dst_port", Value::int(tcp.destination_port() as i64, span));
+            packet_record.push("payload", Value::string(hex::encode(tcp.payload()), span));
         }
-        Some(etherparse::TransportSlice::Icmpv4(_)) => {
+        Some(etherparse::TransportSlice::Icmpv4(icmpv4)) => {
             packet_record.push("protocol", Value::string("ICMPv4", span));
+            packet_record.push(
+                "payload",
+                Value::string(hex::encode(icmpv4.payload()), span),
+            );
         }
-        Some(etherparse::TransportSlice::Icmpv6(_)) => {
+        Some(etherparse::TransportSlice::Icmpv6(icmpv6)) => {
             packet_record.push("protocol", Value::string("ICMPv6", span));
+            packet_record.push(
+                "payload",
+                Value::string(hex::encode(icmpv6.payload()), span),
+            );
         }
         _ => {
             packet_record.push("protocol", Value::string("Unknown", span));

@@ -1,8 +1,7 @@
 mod from;
 
-use nu_plugin::{Plugin, PluginCommand};
-
 use from::pcap::FromPcap;
+use nu_plugin::{Plugin, PluginCommand};
 
 pub struct FormatPcapPlugin;
 

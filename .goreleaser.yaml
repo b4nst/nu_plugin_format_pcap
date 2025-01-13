@@ -1,0 +1,10 @@
+version: 2
+
+builds:
+  - builder: rust
+    binary: nu_plugin_format_pcap
+    # List of targets to be built, in Rust's format.
+    # Default: [ "x86_64-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-pc-windows-gnu", "aarch64-unknown-linux-gnu", "aarch64-apple-darwin" ]
+    # targets:
+    #   - x86_64-apple-darwin
+    #   - x86_64-pc-windows-gnu
